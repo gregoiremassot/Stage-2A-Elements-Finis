@@ -1,0 +1,800 @@
+\documentclass[a4paper,12pt]{article}
+
+% --- Déclaration des packages 
+
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage[T1]{fontenc}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathrsfs}
+\usepackage{stmaryrd}
+
+\usepackage{tikz}
+\usetikzlibrary{decorations.markings}
+\usetikzlibrary{trees}
+\usepackage{graphicx}
+
+\usepackage{listings}
+\lstset{language = bash, breaklines=true}
+\usepackage{verbatim}
+\usepackage{layout}
+\usepackage[top=2.5cm, bottom=2.5cm, left=2.5cm, right=2.5cm]{geometry}
+
+\usepackage{caption} % Pour ne pas avoir le "FIGURE - " qui traine sur les figures
+
+\usepackage{tabularx} % Pour les tableaux
+
+% --- Options de mise en page
+
+\title{Rapport de stage 2A}
+\author{Grégoire MASSOT}
+\date{15 Septembre 2015}
+
+\pagestyle{plain} % ou headings ou empty
+
+\setcounter{tocdepth}{3} % Niveau de précision de la table des matières
+
+% --- Début du document
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\tikzset{->-/.style={decoration={
+  markings,
+  mark=at position #1 with {\arrow{>}}},postaction={destmaryrdcorate}}}
+  
+\section{Résolution d'une EDP par élements finis de Nédelec en 2D}
+\subsection{Position du problème}
+On travaille dans $\mathbb{R}^2$, on utilise le repère cartésien $(\vec{e_{x}}, \vec{e_{y}})$ 
+et les coordonnées cartésiennes usuelles $(x,y)$. Le domaine d'étude est noté $\Omega \subset \mathbb{R}^2$. 
+Le problème que l'on cherche à résoudre sur $\Omega$ est le suivant :
+\[
+\vec{rot}(\vec{rot}(\vec{u}(x,y)) + \vec{u}(x,y) = \vec{f}(x,y)
+\]
+stmaryrd
+$\vec{u}$ est le champs que l'on cherche à déterminer, $\vec{f}$ est un champ connu, appelé "terme source".
+\subsection{Formulation faible}
+On prend une fonction test $\vec{v}(x,y)$ non identiquement nulle. 
+On fait ensuite le produit scalaire de l'équation par $\vec{v}(x,y)$ et on intègre sur $\Omega_{e}$
+\[
+\int_{\Omega} {\vec{v}.(\vec{rot}(\vec{rot}(\vec{u}) + \vec{u}) d\Omega} = \int_{\Omega} {\vec{v}.\vec{f} d\Omega}
+\]
+
+On va supposer que la solution $\vec{u}$ et la fonction test $\vec{v}$ sont dans l'espace de Hilbert suivant :
+\[
+H_{0}(rot, \Omega) =
+\{ \vec{u} \in (\mathcal{L}^{2}(\Omega))^{3} \text{ tel que }
+ \vec{u}\cdot\vec{n}=0 \text{ et } \vec{rot}(\vec{u}) \in (\mathcal{L}^{2}(\Omega))^{3}
+\text{ tel que } \vec{rot}(\vec{u}) \wedge \vec{n} = 0
+\}
+\]
+
+On va simplifier le terme en $\vec{rot}(\vec{rot}(u)) \cdot \vec{v}$. Une formule d'analyse vectorielle nous donne
+
+\[
+\vec{rot}(\vec{rot}(\vec{u})) \cdot \vec{v} = div(\vec{rot}(\vec{u}) \wedge \vec{v}) + \vec{rot}(\vec{u}) \cdot \vec{rot}(\vec{v})
+\]
+
+Donc en intégrant sur le domaine $\Omega$
+\begin{eqnarray*}
+& &\int_{\Omega} {\vec{rot}(\vec{rot}(\vec{u})) \cdot \vec{v}} d\Omega = \int_{\Omega} {div(\vec{rot}(\vec{u}) \wedge \vec{v}) + \vec{rot}(\vec{u}) \cdot \vec{rot}(\vec{v})} d\Omega \\
+&\Leftrightarrow& \int_{\Omega} {\vec{rot}(\vec{rot}(\vec{u})) \cdot \vec{v}} d\Omega = \int_{\partial \Omega} {(\vec{rot}(\vec{u}) \wedge \vec{v})\cdot\vec{n}} d\Omega + \int_{\Omega} {\vec{rot}(\vec{u}) \cdot \vec{rot}(\vec{v})} d\Omega
+\end{eqnarray*}
+
+
+Or $\vec{rot}(\vec{u}) \wedge \vec{n} = 0$ et $\vec{v}\cdot\vec{n}=0$ sur le bord donc on a $(\vec{rot}(\vec{u}) \wedge \vec{v})\cdot \vec{n} = 0$ sur le bord $\partial \Omega$
+On peut donc écrire la formulation variationelle :
+
+\[
+\int_{\Omega} {\vec{rot}(\vec{u})\cdot\vec{rot}(\vec{v}) + \vec{u}\cdot\vec{v} d\Omega} = \int_{\Omega} {\vec{v}.\vec{f} d\Omega}
+\]
+On suppose que la forme bilinéaire $a(\vec{u},\vec{v}) = \vec{rot}(\vec{u})\cdot\vec{rot}(\vec{v}) + \vec{u}\cdot\vec{v}$ est coercive. 
+On peut donc appliquer le théorème de Lax-Milgram et avoir ainsi l'existence et l'unicité de la solution sur $H_{0}(rot, \Omega)$
+\subsection{Maillage du domaine et approximation de Galerkin}
+\subsubsection{Espace d'approximation $V_{h}$}
+Soit un maillage à L triangles de notre domaine de travail $\Omega$ avec des élements triangles numérotés par l'indice $l$ de $1$ à $L$ et taille inférieure à $h$  
+On cherche la fonction $\vec{u}$ dans l'espace d'approximation conforme $V_{h}$ de $H_{0}(rot,\Omega)$
+\[
+V_{h} = {{\vec{v}_{h} \in H_{0}(rot, \Omega) \text{ tel que } \vec{v}_{h|T^{l}} \in \mathcal{R}^{1}(T^{l}) \forall l=1,L}}
+\]
+avec $\forall l \in \llbracket 1,3 \rrbracket$
+\[\mathcal{R}^{1}(T^{l}) = \{ 
+\vec{v_{h}}(x,y) = \vec{a} + \gamma
+\begin{pmatrix}
+-y\\
+x
+\end{pmatrix}
+, \gamma \in \mathbb{R}
+, \vec{a} \in \mathbb{R}^{2}
+_text{ sur } 
+\}\]
+
+\subsubsection{Base de l'espace $V_{h}$}
+Pour chaque triangle $l \in \llbracket 1,L \rrbracket$ de sommets $S_{1}^{l}$, $S_{2}^{l}$, $S_{3}^{l}$, on pose 3 fonctions
+
+\[
+\vec{\tau}_{i}^{l}(x,y)=\frac{1}{\det(\vec{S_{i+1}^{l} S_{i+2}^{l}},\vec{S_{i+1}^{l} S_{i}^{l}})}
+\begin{pmatrix}
+-y+y_{i+2}^{l} \\
+x-x_{i+2}^{l}
+\end{pmatrix}
+\text{ sur } T^{l},\vec{0}\text{ ailleurs }
+\]
+
+Les $\vec{\tau_{i}^{l}}$ forment une base de l'espace d'approximation conforme $V_{h}$. On se concentre désormais sur un seul élement triangle d'indice $l=e$ 
+noté $\Omega_{e}$.
+Ce triangle a ses arêtes orientées.
+
+On peut alors écrire le champs inconnu $\vec{u}$ à l'intérieur de l'élement sous la forme de la combinaison 
+linéaire des 3 champs vectoriels $\vec{\tau_{1}}(x,y)=\vec{\tau_{1}^{e}}(x,y)$, $\vec{\tau_{2}}(x,y)=\vec{\tau_{2}^{e}}(x,y)$ et $\vec{\tau_{3}}(x,y)=\vec{\tau_{3}^{e}}(x,y)$.
+\begin{eqnarray*}
+\vec{u}(x,y) &=& u_{1} \vec{\tau_{1}}(x,y) + u_{2} \vec{\tau_{2}}(x,y) + u_{3} \vec{\tau_{3}}(x,y)
+\end{eqnarray*}
+\subsubsection{Proprietées des fonctions de base}
+Ces fonctions ont la proprietée suivante :
+
+\[
+  \int_{A_{i}} {\vec{\tau}_{j}(x,y).\vec{t}_{i}(x,y)} = 
+  \left\{
+  \begin{array}{r c l}
+  \text{1 si i=j}\\
+  \text{0 sinon}
+  \end{array}
+  \right.
+\]
+
+avec $\vec{t}_{i}$ le vecteur unitaire tangent à l'arête $A_{k}$. Les fonctions de bases sont donc associée à une arête particulière.
+Sur les 2 autres arêtes du triangle le champ est normal a l'arête
+On peut donc écrire que pour $i \in \llbracket 1,3 \rrbracket$:
+
+\begin{eqnarray*}
+u_{i} &=& \int_{A_{i}} {\vec{u}(x,y).\vec{\tau_{i}}(x,y) dr}\\
+\end{eqnarray*}
+
+Le coefficient $u_{i}$ est égal à l'intégrale le long de l'arête $i$ de notre produit scalaire $\vec{u}(x,y).\vec{\tau_{i}(x,y)}$
+\subsection{Construction du système matriciel élémentaire}
+On va maintenant exprimer nos fonctions de base sur l'élement courant à partir des fonctions de base sur l'élement de référence
+afin de pouvoir ramner toutes les inégrales qui constituent le système matriciel élementaire à des intégrales sur l'élement de référence.
+\subsubsection{Fonctions de base sur l'élément de référence}
+On se place désormais sur l'élement de référence triangle $\hat{\Omega}$ avec le système de coordonnées $(\xi, \eta)$. 
+Les sommets du triangle ont pour coordonnées $S_{1} (\xi = 1, \eta = 0)$, $S_{2} (\xi = 0, \eta = 1)$, $S_{3} (\xi = 0, \eta = 0)$
+\begin{center}
+\begin{tikzpicture}
+  \draw[->] (0,0) -- (3,0);
+  \draw[->] (0,0) -- (3,0) node[above] {$\xi$} coordinate (x axis);
+  \draw[->] (0,0) -- (0,3) node[above] {$\eta$} coordinate (y axis);
+  \draw (0,2) -- (2,0);
+  \draw (0,0) node[below, left]{$S_{3}(0,0)$};
+  \draw (0,2) node[left]{$S_{2}(0,1)$};
+  \draw (2,0) node[below]{$S_{1}(1,0)$};
+\end{tikzpicture}
+\end{center}
+Sur l'élement de référence, les fonctions de base s'écrivent de la façon suivante :
+
+\begin{eqnarray*}
+\vec{\tau_{1}^{ref}}(x,y) &=& (1-\eta,\xi)\\
+\vec{\tau_{2}^{ref}}(x,y) &=& (-\eta,\xi)\\
+\vec{\tau_{3}^{ref}}(x,y) &=& (-\eta,\xi-1)\\
+\end{eqnarray*}
+
+\begin{center}
+\begin{figure}[h!]
+\begin{tikzpicture}
+\begin{scope}
+\draw (0,0) -- (0,3) -- (3,0) -- (0,0);
+\draw[->] (0,0.6) -- (1.2,0.6);
+\draw[->] (0,1.2) -- (0.9,1.2);
+\draw[->] (0,1.8) -- (0.6,1.8);
+\draw[->] (0,2.4) -- (0.3,2.4);
+\draw[->] (0.6,0) -- (2.1,0.3);
+\draw[->] (1.2,0) -- (2.7,0.6);
+\draw[->] (1.8,0) -- (3.3,0.9);
+\draw[->] (2.4,0) -- (3.9,1.2);
+\draw[->] (0.6,2.4) -- (0.9,2.7);
+\draw[->] (1.2,1.8) -- (1.8,2.4);
+\draw[->] (1.8,1.2) -- (2.7,2.1);
+\draw[->] (2.4,0.6) -- (3.6,1.8);
+\end{scope}
+\begin{scope}[shift={(6,0)}]
+\draw (0,0) -- (0,3) -- (3,0) -- (0,0);
+\draw[->] (0,0.6) -- (-0.3,0.6);
+\draw[->] (0,1.2) -- (-0.6,1.2);
+\draw[->] (0,1.8) -- (-0.9,1.8);
+\draw[->] (0,2.4) -- (-1.2,2.4);
+\draw[->] (0.6,0) -- (0.6,0.3);
+\draw[->] (1.2,0) -- (1.2,0.6);
+\draw[->] (1.8,0) -- (1.8,0.9);
+\draw[->] (2.4,0) -- (2.4,1.2);
+\draw[->] (0.6,2.4) -- (-0.6,2.7);
+\draw[->] (1.2,1.8) -- (0.3,2.4);
+\draw[->] (1.8,1.2) -- (1.2,2.1);
+\draw[->] (2.4,0.6) -- (2.1,1.8);
+\end{scope}
+\begin{scope}[shift={(12,0)}]
+\draw (0,0) -- (0,3) -- (3,0) -- (0,0);
+\draw[->] (0,0.6) -- (-0.3,-0.9);
+\draw[->] (0,1.2) -- (-0.6,-0.3);
+\draw[->] (0,1.8) -- (-0.9,0.3);
+\draw[->] (0,2.4) -- (-1.2,0.9);
+\draw[->] (0.6,0) -- (0.6,-1.2);
+\draw[->] (1.2,0) -- (1.2,-0.9);
+\draw[->] (1.8,0) -- (1.8,-0.6);
+\draw[->] (2.4,0) -- (2.4,-0.3);
+\draw[->] (0.6,2.4) -- (-0.6,1.2);
+\draw[->] (1.2,1.8) -- (0.3,0.9);
+\draw[->] (1.8,1.2) -- (1.2,0.6);
+\draw[->] (2.4,0.6) -- (2.1,0.3);
+\end{scope}
+\end{tikzpicture}
+\caption*{Les fonctions $\vec{\tau_{1}}(x,y)$, $\vec{\tau_{2}}(x,y)$ et $\vec{\tau_{3}}(x,y)$ sur l'élement de référence}
+\end{figure}
+\end{center}
+\subsubsection{Transformation géométrique}
+On a explicité les fonctions de bases sur un élement de référence. 
+Il s'agit maintenant de savoir comment on passe de cet élement de référence à un 
+élement ayant des sommets de coordonnées quelconques et des arêtes d'orientations quelconques.
+
+\begin{center}
+\begin{tikzpicture}
+  \draw[->] (0,0) -- (3,0) node[right] {$\xi$} coordinate (x axis);
+  \draw[->] (0,0) -- (0,3) node[above] {$\eta$} coordinate (y axis);
+  \draw[->-=.5] (0,0) -- (2,0);
+  \draw[->-=.5] (2,0) -- (0,2);
+  \draw[->-=.5] (0,2) -- (0,0);
+  
+  \draw (0,0) node[below, left]{$S_{3,ref}(0,0)$};
+  \draw (0,2) node[left]{$S_{2,ref}(0,1)$};
+  \draw (2,0) node[below]{$S_{1,ref}(1,0)$};
+  
+  \draw[->] (2,2) to[bend left] (5,2);
+  
+  \draw[->] (6,0) -- (9,0) node[right] {$x$} coordinate (x axis);
+  \draw[->] (6,0) -- (6,3) node[above] {$y$} coordinate (y axis);
+  \draw[->-=.5] (7,2) -- (12,3);
+  \draw[->-=.5] (12,3) -- (9,5);
+  \draw[->-=.5] (7,2) -- (9,5);
+  
+  \draw (7,2) node[below]{$S_{1}(1,2)$};
+  \draw (12,3) node[below]{$S_{2}(6,3)$};
+  \draw (9,5) node[above]{$S_{3}(3,5)$};
+\end{tikzpicture}
+\end{center}
+
+On définit une fonction 
+\begin{eqnarray*}
+\Psi : &\mathbb{R}^{2}& \rightarrow \mathbb{R}^{2} \\
+&(\xi, \eta)& \rightarrow (x,y)
+\end{eqnarray*}
+qui à chaque sommet $i$ de l'élement de référence associe le sommet $i$ de l'élement de courant. On peut aussi voir cette fonction comme un champs vectoriel sur l'ensemble du maillage.
+Il est appelé dans MEF++ le "Champ de transformation géométrique". On va chercher ici une transformation linéaire, c'est à dire que on écrit :
+
+\begin{eqnarray*}
+x &=& a_{1} \xi + b_{1} \eta + c_{1} \\
+y &=& a_{2} \xi + b_{2} \eta + c_{2} \\
+\end{eqnarray*}
+
+On résous ce système de 6 équations à 6 inconnues : 
+
+\[
+\left\{
+\begin{array}{r c l}
+f(S_{1}) &=& S_{1, ref} \\
+f(S_{2}) &=& S_{2, ref} \\
+f(S_{3}) &=& S_{3, ref} \\
+\end{array}
+\right.
+\]
+
+On obtient alors :
+
+\[
+\left\{
+\begin{array}{r c l}
+a_{1} &=&  \frac{1}{2\alpha}(y_{2} - y_{3})\\
+b_{1} &=&  \frac{1}{2\alpha}(x_{3} - x_{2})\\
+c_{1} &=&  \frac{1}{2\alpha}(x_{2} y_{3} - x_{3} y_{2})\\
+\\
+a_{2} &=&  \frac{1}{2\alpha}(y_{3} - y_{1})\\
+b_{2} &=&  \frac{1}{2\alpha}(x_{1} - x_{3})\\
+c_{2} &=&  \frac{1}{2\alpha}(x_{3} y_{1} - x_{1} y_{3})\\
+\end{array}
+\right.
+\]
+avec
+\[
+2\alpha = (x_{2} - x_{1})(y_{3}-y_{1}) - (x_{3} - x_{1})(y_{2}-y_{1})
+\]
+On en déduit la matrice jacobienne de $\Psi$
+
+\[
+J =
+\begin{pmatrix}
+\frac{\partial x}{\partial \xi} & \frac{\partial x}{\partial \eta} \\
+\frac{\partial y}{\partial \xi} & \frac{\partial y}{\partial \eta} \\
+\end{pmatrix}
+=
+\frac{1}{2\alpha}
+\begin{pmatrix}
+y_{2} - y_{3} & x_{3} - x_{2} \\
+y_{3} - y_{1} & x_{1} - x_{3} \\
+\end{pmatrix}
+\]
+On admet alors les formules suivantes pour la transformation des fonctions de base. Pour $i \in \llbracket 1,3 \rrbracket$
+\begin{eqnarray*}
+& &\vec{\tau}_{i}(x(\xi, \eta),y(\xi, \eta)) = (J^{-1})^{t}\vec{\tau}_{i}^{ref}(\xi, \eta) \\
+& &\vec{rot}(\vec{\tau}_{i})(x(\xi, \eta),y(\xi, \eta)) = \frac{J}{det(J)}\vec{rot}(\vec{\tau}_{i}^{ref})(\xi, \eta)
+\end{eqnarray*}
+\subsubsection{Ecriture des termes de formulation}
+La fonction inconnue $\vec{u}$ et la fonction test $\vec{v}$ s'écrivent dans notre espace d'approximation interne $V_{h}$
+\begin{eqnarray*}
+\vec{u}(x,y) &=& u_{1} \vec{\tau_{1}}(x,y) + u_{2} \vec{\tau_{2}}(x,y) + u_{3} \vec{\tau_{3}}(x,y) \\
+\vec{v}(x,y) &=& v_{1} \vec{\tau_{1}}(x,y) + v_{2} \vec{\tau_{2}}(x,y) + v_{3} \vec{\tau_{3}}(x,y)
+\end{eqnarray*}
+avec
+\begin{eqnarray*}
+\vec{\tau_{1}}(x,y) &=& \tau_{1,x}(x,y)\vec{e_{x}} + \tau_{1,y}(x,y)\vec{e_{y}} \\
+\vec{\tau_{2}}(x,y) &=& \tau_{2,x}(x,y)\vec{e_{x}} + \tau_{2,y}(x,y)\vec{e_{y}} \\
+\vec{\tau_{3}}(x,y) &=& \tau_{3,x}(x,y)\vec{e_{x}} + \tau_{3,y}(x,y)\vec{e_{y}}
+\end{eqnarray*}
+On écrit ces fonctions sous forme matricielle
+\begin{equation*}
+\vec{u}(x,y) =
+\begin{pmatrix}
+  \tau_{1,x} & \tau_{2,x} & \tau_{3,x}
+\end{pmatrix}
+\begin{pmatrix}
+  u_{1} \\ u_{2} \\ u_{3}
+\end{pmatrix}
+\vec{e}_{x}
++
+\begin{pmatrix}
+  \tau_{1,y} & \tau_{2,y} & \tau_{3,y}
+\end{pmatrix}
+\begin{pmatrix} 
+  u_{1} \\ u_{2} \\ u_{3}
+\end{pmatrix}
+\vec{e}_{y}
+\end{equation*}
+
+\begin{equation*}
+\begin{split}
+  \vec{v}(x,y) =
+  \begin{pmatrix}
+    \tau_{1,x} & \tau_{2,x} & \tau_{3,x}
+  \end{pmatrix}
+  \begin{pmatrix}
+    v_{1} \\ v_{2} \\ v_{3}
+  \end{pmatrix}
+  \vec{e}_{x}
+  +
+  \begin{pmatrix}
+    \tau_{1,y} & \tau_{2,y} & \tau_{3,y}
+  \end{pmatrix}
+  \begin{pmatrix}
+    v_{1} \\ v_{2} \\ v_{3}
+  \end{pmatrix}
+  \vec{e}_{y}
+  \\
+  =
+  \begin{pmatrix}
+    v_{1} & v_{2} & v_{3}
+  \end{pmatrix}
+    \begin{pmatrix}
+    \tau_{1,x} \\ \tau_{2,x} \\ \tau_{3,x}
+  \end{pmatrix}
+  \vec{e}_{x}
+  +
+  \begin{pmatrix}
+    v_{1} & v_{2} & v_{3}
+  \end{pmatrix}
+    \begin{pmatrix}
+    \tau_{1,y} \\ \tau_{2,y} \\ \tau_{3,y}
+  \end{pmatrix}
+  \vec{e}_{x}
+  \vec{e}_{y}
+\end{split} 
+\end{equation*}
+
+On écrit de même les rotationnels sous forme matricielle 
+
+\begin{eqnarray*}
+\vec{rot}(\vec{u}(x,y)) &=& 
+u_{1} \vec{rot}(\vec{\tau_{1}}(x,y)) + u_{2} \vec{rot}(\vec{\tau_{2}}(x,y)) + u_{3} \vec{rot}(\vec{\tau_{3}}(x,y)) \\
+&=& 
+\begin{pmatrix}
+(\frac{\partial \tau_{1,y}}{\partial x} - \frac{\partial \tau_{1,x}}{\partial y})
+&
+(\frac{\partial \tau_{2,y}}{\partial x} - \frac{\partial \tau_{2,x}}{\partial y})
+&
+(\frac{\partial \tau_{3,y}}{\partial x} - \frac{\partial \tau_{3,x}}{\partial y})
+\end{pmatrix}
+\begin{pmatrix}
+  u_{1} \\ u_{2} \\ u_{3}
+\end{pmatrix}
+\vec{e}_{z}
+\end{eqnarray*}
+
+\begin{eqnarray*}
+\vec{rot}(\vec{v}(x,y)) &=&
+\begin{pmatrix} 
+(\frac{\partial \tau_{1,y}}{\partial x} - \frac{\partial \tau_{1,x}}{\partial y})
+&
+(\frac{\partial \tau_{2,y}}{\partial x} - \frac{\partial \tau_{2,x}}{\partial y})
+&
+(\frac{\partial \tau_{3,y}}{\partial x} - \frac{\partial \tau_{3,x}}{\partial y})
+\end{pmatrix}
+\begin{pmatrix}
+  v_{1} \\ v_{2} \\ v_{3}
+\end{pmatrix}
+\vec{e_{z}} \\
+&=& 
+\begin{pmatrix}
+  v_{1} & v_{2} & v_{3}
+\end{pmatrix}
+\begin{pmatrix}
+(\frac{\partial \tau_{1,y}}{\partial x} - \frac{\partial \tau_{1,x}}{\partial y}) 
+\\
+(\frac{\partial \tau_{2,y}}{\partial x} - \frac{\partial \tau_{2,x}}{\partial y})
+\\
+(\frac{\partial \tau_{3,y}}{\partial x} - \frac{\partial \tau_{3,x}}{\partial y})
+\end{pmatrix}
+\vec{e}_{z}
+\end{eqnarray*}
+
+Le terme source $\vec{f}$ s'écrit :
+\[
+\vec{f}(x,y) =
+f_{x}(x,y) \vec{e}_{x} + f_{y}(x,y) \vec{e}_{y}
+\]
+
+On revient à la formulation faible et on divise par $\begin{pmatrix} v_{1} & v_{2} & v_{3} \end{pmatrix}$. On obtient le système linéaire à 3 inconnues :
+\[MU = F\]
+avec
+\begin{itemize}
+\item $M$ la matrice masse $3\times3$
+\item $F$ le vecteur résidu
+\item $U$ le vecteur que l'on cherche
+\end{itemize}
+
+\begin{eqnarray*}
+M_{i,j} &=& \int_{\Omega_{e}} {\vec{\tau_{i}}.\vec{\tau_{j}} + \vec{rot}(\vec{\tau_{i}}).\vec{rot}(\vec{\tau_{j}}) d\Omega_{e}} \\
+&=&
+\int_{\hat{\Omega}} {(J^{-1})^{t}\vec{\tau_{i,ref}}.(J^{-1})^{t}\vec{\tau_{j,ref}} + \frac{J}{\det(J)}\vec{rot}(\vec{\tau_{i,ref}}).\frac{J}{\det(J)}\vec{rot}(\vec{\tau_{j,ref}}) \hat{d\Omega}} \\
+&=&
+\int_{\hat{\Omega}} {\tilde{M}_{i,j} d\hat{\Omega}} \\
+F_{i} &=&
+\int_{\Omega_{e}} {\vec{f_{i}}.\vec{\tau_{i}} d\Omega_{e}} \\
+&=&
+\int_{\hat{\Omega}} {\vec{f_{i}}.(J^{-1})^{t}\vec{\tau_{i}^{ref}} d\hat{\Omega}} \\
+&=&
+\int_{\hat{\Omega}} {\tilde{F}_{i} d\hat{\Omega}} \\
+\end{eqnarray*}
+\subsubsection{Intégration numérique}
+Enfin, on calcule les intégrales de en faisant une quadrature. On choisit un nombre $p$ de points d'intégrations :
+\begin{eqnarray*}
+M_{i,j} &=& \int_{\hat{\Omega_{e}}} {\tilde{M}_{i,j} d\hat{\Omega_{e}}}
+= \sum_{k=1}^{p} W_{k} \tilde{M}_{i,j}(\xi_{k}, \eta_{k})
+\\
+F_{i} &=& \int_{\hat{\Omega_{e}}} {\tilde{F}_{i} d\hat{\Omega_{e}}}
+= \sum_{k=1}^{p} W_{k} \tilde{F}_{i}(\xi_{k}, \eta_{k})
+\end{eqnarray*}
+
+\subsection{Assemblage, et résolution}
+\subsubsection{Assemblage}
+On va ensuite créer ce système élementaire pour chaque élement (ici des triangles) du maillage. 
+Il s'agit ensuite de superposer les systèmes linéaires élémentaires pour obtenir notre système linéaire global.
+
+On commence par numéroter les arêtes dans le maillage global $k=1..n$ et les orienter afin de les identifier. 
+Le triangle d'indice $l$ a les arêtes d'indices $k_{l1},k_{l2},k_{l3}$. Le terme de la matrice de masse élémentaire
+$M_{i,j}^{e}$ va être inseré dans la case $M_{k_{li}, k_{lj}}$ et celui du vecteur résidu élementaire $F_{i}^{e}$ va aller dans la case $F_{k_{li}}$
+\subsubsection{Visualisation des résultats}
+On fait le test sur un carré de sommets $(0,0)$, $(0,1)$, $(1,1)$, $(1,0)$. On utilise la solution analytique suivante
+\[
+\vec{u}(x,y)=
+\begin{pmatrix}
+2sin(\pi x)cos(\pi y) \\
+cos(\pi x)sin(\pi y)
+\end{pmatrix}
+\]
+Ce qui conduit au terme source suivant :
+\[
+\vec{f}(x,y)=
+\begin{pmatrix}
+(\pi^{2}+2)sin(\pi x)cos(\pi y) \\
+(1-\pi^{2})cos(\pi x)sin(\pi y)
+\end{pmatrix}
+\]
+Après résolution, on obtient un vecteur solution de taille le nombre $n$ d'arêtes. Celui ci n'est pas exploitable en lui même pour visualiser la solution. 
+Il faut, pour chaque élement, calculer le champ sur quelques points de l'élement en reprenant la formule :
+\begin{eqnarray*}
+\vec{u}(x,y) &=& u_{k_{l1}} \vec{\tau_{k_{l1}}}(x,y) + u_{k_{l2}} \vec{\tau_{k_{l2}}}(x,y) + u_{k_{l3}} \vec{\tau_{k_{l3}}}(x,y) \text{ sur le triangle } l
+\end{eqnarray*}
+On fait donc une réinterpolation d'un champ \texttt{v3dnedelec} vers un champ \texttt{Vectoriel3D} dans MEF++.
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[scale=0.3]{carre_nedelec.png}
+\caption*{Solution obtenue par élements finis}
+\end{center}
+\end{figure}
+\subsubsection{Etude de convergence}
+On veut calculer la norme $\mathcal{L}^{2}$ de la différence entre le vecteur solution élements finis et le vecteur solution analytique. 
+\[
+e_{\mathcal{L}^{2}} = \sqrt{\frac{\sum_{i=0}^{n} (u_{i} - u_{i}^{sol})^{2}}{\sum_{i=0}^{n} (u_{i}^{sol})^{2}}}
+\]
+Il faut pour cela que la solution analytique donnée plus haut soit comparable à la solution éléments finis. Ill faut donc faire une réinterpolation du champs
+\texttt{Vectoriel3D} vers \texttt{v3dnedelec} dans MEF++ avec la formule :
+\begin{eqnarray*}
+u_{i}^{sol} &=& \int_{A_{i}} {\vec{u}(x,y).\vec{\tau_{i}}(x,y) dr}\\
+\end{eqnarray*}
+On obtient alors le tableau de convergence suivant.
+\begin{center}
+\begin{tabular}{|c|c|}
+\hline
+$h$ & $e_{\mathcal{L}^{2}}(h)$ \\
+\hline
+$5 \cdot 10^{-2}$ & 0.64 \\
+\hline
+$2.5 \cdot 10^{-2}$ &  0.32 \\
+\hline
+$1.25 \cdot 10^{-2}$ &  0.16 \\
+\hline
+\end{tabular}
+\end{center}
+On a donc une convergence à l'ordre 1 de $\vec{u}$
+\subsection{Remarques}
+\begin{itemize}
+\item Le nombre de degrés de libertés est égal au nombre d'arêtes dans le maillage. C'est pour cela que l'on appelle les élèments de Nédelec des élements d'arêtes.
+\item On peut généraliser au cas 3D  avec des élements tétraèdres. On a alors 6 arêtes par élements. On a toujours une convergence de $\vec{u}$ à l'ordre 1
+\item L'intêret des élements de Nedelec est de pouvoir imposer facilement une condition au bord $\vec{u} \wedge \vec{n}=0$, c'est à dire imposer un champ normal au bord.
+Il suffit d'imposer que les coefficients associés aux arêtes au bord soient nuls. C'est l'équivalent d'une condition de Dirichlet homogène pour les élements de Lagrange. 
+\end{itemize}
+\section{Résolution d'une EDP par élements de Raviart-Thomas en 3D}
+Les éléments de Raviart-Thomas sont aux faces ce que les éléments de Nédélec sont aux arêtes.
+\newpage
+\section{Aspects pratiques de l'utilisation de MEF++}
+\subsection{A propos de MEF++}
+Le logiciel MEF++ est développé depuis 1997 par le GIREF, une unité du département de mathématiques de l'Université Laval. 
+Il est développé principalement par des ingénieurs et des professeurs d'université. 
+Il est aussi développé par des doctorants et des stagiaires. MEF++ est développé à la fois pour la recherche publique et la recherche privée. 
+Le laboratoire est donc financé à la fois par le CRSNG (un organisme public canadien) et par des entreprises.
+\newline
+\newline
+MEF++ est principalement développé en C++. Ils compte à ce jour 1.7 millions de lignes de code
+\subsection{Principes généraux de la résolution d'une EDP sous MEF++}
+
+Le choix de l'EDP à résoudre est fait à l'intérieur du code MEF++. Si on veut changer de problème, on change d'exécutable. 
+En revanche le choix de $\Omega$, des conditions aux limites et des valeurs des champs connus sont lus par MEF++ depuis des fichiers externes
+\newline
+\newline
+On cherche à résoudre les EDP sur des objets quelconques. Par exemple un cube, une poutre, un tore. 
+On commence par représenter cet objet avec une \emph{géométrie}. 
+Ce sont les points, les courbes, les surfaces et les volumes qui permettent de se représenter l'objet dans l'espace.
+Les points, les courbes, les surfaces et les volumes sont regroupés sous la notion de \emph{lieux géométriques}.
+La \emph{géométrie} est donc l'ensemble des \emph{lieux géométriques} de notre objet. La géométrie est enregistré dans un fichier \texttt{.geo}
+
+On définit ensuite les \emph{entitées géométriques}. Ce sont des regroupement de \emph{lieux géométriques}. 
+On définit souvent plusieurs \emph{entitées géométriques} par \emph{géométrie}. Elles servent principalement à préciser sur quels bords on impose les conditions aux limites 
+ou à définir les proprietées physiques des milieux.
+Ils sont enregistrés sous le format \texttt{.enti}.
+
+On définit le \emph{maillage} à partir de la \emph{géométrie}. Il peut y avoir plusieurs \emph{maillages} par \emph{géométrie} mais un \emph{maillage} ne correspond qu'à une seule \emph{géométrie}. 
+Les \emph{maillages} sont enregistrés au format \texttt{.mail}
+
+Les informations sur les champs qui sont en jeu dans l'EDP et les proprietées physiques des milieux sont enregistrées dans un fichier \texttt{.champ}
+
+Les conditions aux limites sont définies dans le fichier \texttt{.CL}. Elles font références aux \texttt{.enti} et eux \texttt{.champs}
+\newline
+\newline
+On crée le \texttt{.geo} à la main. On le passe dans GMSH pour obtenir un maillage au format \texttt{.unv}. 
+On passe le \texttt{.unv} dans iMEF++ pour créer les entitées géométriques et obtenir un \texttt{.mail} et un \texttt{.enti}
+On code à la main le \texttt{.champs} et le \texttt{.CL} ou on les récupère à partir de templates.
+\subsection{Organisation du répertoire de travail}
+\subsubsection{Arborescence du répertoire de travail}
+\begin{center}
+\tikzstyle{every node}=[draw=black,thick,anchor=west]
+\tikzstyle{selected}=[draw=red,fill=red!30]
+\tikzstyle{optional}=[dashed,fill=gray!50]
+\begin{figure}[h!]
+\begin{tikzpicture}[%
+  grow via three points={one child at (0.5,-0.7) and
+  two children at (0.5,-0.7) and (0.5,-1.4)},
+  edge from parent path={(\tikzparentnode.south) |- (\tikzchildnode.west)}]
+  \node {mefpp\_gmassot}
+    child { 
+      node {GIREF}
+      child { node {app}}
+      child { node {bin}}
+      child { node {lib}}
+      child { node {scripts}}
+      child { node {src}}
+    }
+    child [missing] {}				
+    child [missing] {}				
+    child [missing] {}	
+    child [missing] {}	
+    child [missing] {}	
+    child {node {Tests\_probRaviart}}
+    child {node {Tests\_probLaplacienVect}}
+    child { 
+      node {Tests\_probMaxwell}
+	child { 
+	  node {cube\_1}
+	  child { node {div2}
+	    child {node {cube.mail}}}
+	  child [missing] {}	
+	  child { node {div4}}
+	  child { node {div8}}
+	  child { node {cube.champs}}
+	  child { node {cube.CL}}
+	  child { node {cube.enti}}
+	  child { node {launch\_probMaxwell.sh}}
+	}
+	child [missing] {}	
+	child [missing] {}	
+	child [missing] {}	
+	child [missing] {}	
+	child [missing] {}	
+	child [missing] {}	
+	child [missing] {}	
+	child [missing] {}	
+	child { node {carre\_1}}
+	child { node {tetra\_1}}	
+    }
+    child [missing] {}	
+    child [missing] {}	
+    child [missing] {}	
+    child [missing] {}	
+    child [missing] {}	
+    child [missing] {}	
+    child [missing] {}	
+    child [missing] {}	
+    child [missing] {}	
+    child [missing] {}	
+    child [missing] {}	
+    child { 
+      node {maillages}
+	child { 
+	  node {cube\_1}
+	  child { node {cube.geo}}
+	  child { node {cube.mail}}
+	  child { node {cube.unv}}
+	}	
+	child [missing] {}	
+	child [missing] {}	
+	child [missing] {}	
+	child {node {carre\_1}}	
+	child {node {tetra\_1}}		
+    }
+    ;
+\end{tikzpicture}
+\caption*{Arborescence du répertoire de travail personnel \texttt{mefpp\_gmassot}}
+\end{figure}
+\end{center}
+
+\subsubsection{Dossier \texttt{GIREF/}}
+Le dossier \texttt{GIREF/} contient le programme MEF++. C'est la copie du \emph{dépot} Git. Il est composé de plusieurs dossiers :
+\begin{itemize}
+\item \texttt{app/} : contient des fichiers sources \texttt{.cc} ne contenant que des fonctions main. Une fonction main correspond à un executable et à une EDP particulière à résoudre.
+\item \texttt{bin/} : contient les exécutables issus de ces fonctions main
+\item \texttt{lib/} : contient les bibliothèques dynamiques \texttt{.so}. Ce sont ces outils qui sont appelés dans les fonctions main du dossier \texttt{app/}
+\item \texttt{src/} : contient les sources dont sont issus les \texttt{.so}
+\item \texttt{scripts/} : contient les scripts \texttt{.py} et \texttt{.sh} de routine (mise en forme des résultats exportés par exemple)
+\end{itemize} 
+\subsubsection{Dossier \texttt{maillages/} }
+
+Le dossier \texttt{maillages/} contient les différents dossiers de maillages. Ce sont les dossiers de travail pour créer un \texttt{.unv} à partir d'un \texttt{.geo} avec GMSH.
+On fait en sorte d'avoir des maillages grossiers en sortie de GMSH pour pouvoir les raffiner automatiquement avec l'outil \texttt{GIREF/bin/diviseAreteEn2} et ainsi faire des études de convergence.
+
+\subsubsection{Dossier \texttt{Tests\_prob***/}}
+
+On crée pour chaque problème un nouveau fichier main dans \texttt{GIREF/app/} et on crée un nouveau dossier générique dans la racine \texttt{mefpp\_gmassot} nommé
+\texttt{Tests\_prob***/}. Par exemple \texttt{Tests\_probMaxwell/} correspond au premier problème étudié en partie 1, \texttt{Tests\_probRaviart/} correspond au second problème étudié en partie 2.
+
+Dans chacun de ces dossiers, on copie les maillages du dossier \texttt{maillages/} qui nous intéressent, on crée des fichiers \texttt{.champs} et \texttt{.CL}
+et on lance ensuite des scripts shell pour avoir une série de maillages de plus en plus fins et effectuer de manière automatique des tests de convergence sur une EDP.
+\newline
+\newline
+On commence par créer des sous dossiers \texttt{div2/}, \texttt{div4/}, \texttt{div8/}...
+Pour chaque sous-dossier \texttt{div\$i/}, on lance \texttt{GIREF/bin/diviseAreteEn2} et on met le résultat dans \texttt{../div\$i+1/}
+On crée ensuite, dans chacun des sous-dossiers, un lien symbolique vers les fichiers \texttt{.enti}, \texttt{.CL}, \texttt{.champs}.
+
+\begin{verbatim}
+#!/bin/bash
+mkdir div2
+/home/mefpp_gmassot/GIREF/bin/diviseAreteEn2.opt cube div2/cube
+for i in 2 4 8 16 32
+do
+mkdir -p div$i
+cd div$i
+ln -sf ../cube.{enti,CL,champs} .
+cd ..
+done
+\end{verbatim}
+On peut ainsi lancer le programme à tester dans chaque dossier (par exemple \texttt{probMaxwell.opt})
+\begin{verbatim}
+for i  in 2 4 8 16 
+do
+cd  div$i
+/home/mefpp_gmassot/GIREF/bin/probMaxwell.opt cube
+cd ..
+done
+\end{verbatim}
+On affiche dans chaque dossier les résultats importants qui ont été exportés par MEF++. Par exemple l'erreur en norme $\mathcal{L}^{2}$ entre la soution analytique
+et la solution élements finis.
+\begin{verbatim}
+for i in 2 4 8 16
+do
+cd div$i
+cat NormeResiduL2.valeurs
+cd ..
+done 
+\end{verbatim}
+\subsection{Logiciels auxiliaires utilisés}
+\subsubsection{Git}
+Git est l'outil de gestion de version utilisé au GIREF. L'ensemble des fichiers sources, \emph{le dépot}, est stocké sur un serveur.
+On peut faire une copie du \emph{dépot}, le modifier, puis faire un \emph{commit}, c'est à dire renvoyer les fichiers modifiés sur le serveur. 
+Voici les principales commandes utilisées :
+
+\begin{table}[!h]
+\begin{center}
+  \begin{tabularx}{\textwidth}{|c|X|}
+  \hline
+  \textbf{Commande Git} & \textbf{Fonction} \\
+  \hline
+  \texttt{git status} & Permet de voir l'ensemble des fichiers modifiés sur la copie du \emph{dépot} mais non commités. En vert les fichiers qui sont sur la liste du prochain \emph{commit}. En rouge les fichiers qui n'y sont pas \\
+  \hline
+  \texttt{git diff fichier} & Permet de voir les modifications faites sur \texttt{fichier} depuis le dernier \emph{commit} \\
+  \hline
+  \texttt{git add fichier} & Ajoute \texttt{fichier} sur la liste du prochain \emph{commit} \\
+  \hline
+  \texttt{git checkout (-p) fichier} & Enlève les modifications faites en local sur \texttt{fichier} \\
+  \hline
+  \end{tabularx}
+\end{center}
+\end{table}
+
+On utilise aussi qGit qui est une interface graphique pour GIT. Elle permet de naviguer facilement entre les différents commits.
+\subsubsection{Redmine}
+Redmine est le gestionnaire de projet de MEF++. C'est un site web en interne qui contient, entre autres : 
+\begin{itemize}
+\item Une documentation : Elle est génerée automatiquement à partir des commentaires des fichiers sources
+\item Un wiki
+\item Un fil d'actualité
+\item Un forum
+\end{itemize}
+
+\subsubsection{Maple}
+
+On utilise la méthode des solutions manufacturières pour tester les programmes. 
+On a une solution connue de l'EDP et on en déduit le terme source à partir de cette EDP.
+On utilise alors Maple afin de faire le calcul formel et rentrer l'expression du terme source dans le fichier \texttt{.champs}
+Par exemple :
+\begin{verbatim}
+with(VectorCalculus)
+Vx := 3*cos(Pi*x)*sin(Pi*y)*sin(Pi*z)
+Vy := 2*sin(Pi*x)*cos(Pi*y)*sin(Pi*z)
+Vz := sin(Pi*x)*sin(Pi*y)*cos(Pi*z)
+v := VectorField(`<,>`(Vx, Vy, Vz), 'cartesian'[x, y, z])
+champs := simplify(-Laplacian(v)+v)
+\end{verbatim}
+
+\subsubsection{Outils de parallelisation}
+Le code est parallelisé. On peut accélerer l'execution des programmes sur sa machine en les lançant avec \texttt{mpirun}. 
+On peut aussi les faire executer sur le centre de calcul de l'université \emph{Colosse} 
+On peut aussi paralléliser la compilation des bibliothèques sur l'ensemble des machines du laboratoire avec l'outil \texttt{icecream}.
+C'est utile quand on a tous les \texttt{.so} à recompiler
+\subsubsection{Autres logiciels}
+Parmi les autres logiciels utilisés, on a :
+\begin{itemize}
+\item[$\bullet$] GMSH : c'est un mailleur libre et gratuit
+\item[$\bullet$] Paraview : Il permet de visualiser les résultats obtenus sur la géométrie en 2D et en 3D
+\item[$\bullet$] Vim : L'éditeur de texte pour modifier rapidement les fichiers \texttt{.champs}, les \texttt{.CL} et les scripts
+\item[$\bullet$] QtCreator : un IDE complet et gratuit pour coder en C++
+\item[$\bullet$] iMEF++ : un logiciel annexe à MEF++. Il sert principalement à créer des fichiers \texttt{.mail} et \texttt{.enti} à partir du fichier \texttt{.unv} issu de GMSH
+\end{itemize}
+
+\end{document}

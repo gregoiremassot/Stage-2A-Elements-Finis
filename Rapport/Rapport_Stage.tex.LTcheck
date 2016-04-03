@@ -1,0 +1,182 @@
+Expected text language: French (no spell checking active, specify a language variant like 'en-GB' if available)
+Working on Rapport_Stage.tex...
+1.) Line 19, column 13, Rule ID: LISTING[1]
+Message: « Listing » est un anglicisme. Employez 'listage' (informatique).
+Suggestion: listage
+...ry{trees} \usepackage{graphicx}  \usepackage{listings} \lstset{language = bash, breaklines=true} \...
+                                                ^^^^^^^^                                             
+
+2.) Line 37, column 10, Rule ID: MOIS[1]
+Message: Les mois de l’année n’ont pas de majuscule. Voulez-vous écrire 'septembre' ?
+Suggestion: septembre
+... stage 2A} \author{Grégoire MASSOT} \date{15 Septembre 2015}  \pagestyle{plain} % ou headings ou em...
+                                                ^^^^^^^^^                                             
+More info: http://www.academie-francaise.fr/la-langue-francaise/questions-de-langue#42_strong-em-jours-de-la-semaine-pluriel-et-majuscules-em-strong
+
+3.) Line 280, column 116, Rule ID: CEST_A_DIRE[1]
+Message: « C’est à dire » est une faute de typographie. Employez 'c'est-à-dire'.
+Suggestion: c'est-à-dire
+...va chercher ici une transformation linéaire, c'est à dire que l'on écrit :  \begin{eqnarray*} x &=& a_...
+                                                ^^^^^^^^^^^^                                             
+
+4.) Line 371, column 8, Rule ID: SPLIT[1]
+Message: « Split » est un anglicisme. Employez 'grand écart' (figure de gymnastique), 'maison à deux niveaux' (bâtiment).
+Suggestion: grand écart; maison à deux niveaux
+...y} \end{equation*}  \begin{equation*} \begin{split}   \vec{v}(x,y) =   \begin{pmatrix}     \tau...
+                                                ^^^^^                                             
+
+5.) Line 406, column 6, Rule ID: SPLIT[1]
+Message: « Split » est un anglicisme. Employez 'grand écart' (figure de gymnastique), 'maison à deux niveaux' (bâtiment).
+Suggestion: grand écart; maison à deux niveaux
+...nd{pmatrix}   \vec{e}_{x}   \vec{e}_{y} \end{split}  \end{equation*}  On écrit de même les rota...
+                                                ^^^^^                                             
+
+6.) Line 484, column 34, Rule ID: ELISION[1]
+Message: « de en » s’élide en 'd’en'.
+Suggestion: d’en
+... numérique} Enfin, on calcule les intégrales de en faisant une quadrature. On choisit un nombre...
+                                                ^^^^^                                             
+More info: http://66.46.185.79/bdl/gabarit_bdl.asp?Th=2&t1=&id=1737
+
+7.) Line 498, column 66, Rule ID: DOUBLE_PUNCTUATION
+Message: Deux points consécutifs
+Suggestion: .
+...roter les arêtes dans le maillage global $k=1..n$ et les orienter afin de les identifier.  L...
+                                                ^^                                             
+
+8.) Line 518, column 118, Rule ID: FR_COMPOUNDS
+Message: Écrivez avec un trait d’union.
+Suggestion: lui-même
+... d'arêtes. Celui ci n'est pas exploitable en lui même pour visualiser la solution.  Il faut, pour ...
+                                                ^^^^^^^^                                             
+
+9.) Line 532, column 71, Rule ID: ACCORD_GENRE[1]
+Message: « vecteur » et « solution » ne semblent pas bien accordés en genre.
+... $\mathcal{L}^{2}$ de la différence entre le vecteur solution éléments finis et le vecteur solution analyt...
+                                                ^^^^^^^^^^^^^^^^                                             
+
+10.) Line 532, column 79, Rule ID: ACCORD_NOMBRE[4]
+Message: « solution » et « éléments » ne semblent pas bien accordés en nombre.
+...al{L}^{2}$ de la différence entre le vecteur solution éléments finis et le vecteur solution analytique.  \[...
+                                                ^^^^^^^^^^^^^^^^^                                             
+
+11.) Line 532, column 109, Rule ID: ACCORD_GENRE[1]
+Message: « vecteur » et « solution » ne semblent pas bien accordés en genre.
+...tre le vecteur solution éléments finis et le vecteur solution analytique.  \[ e_{\mathcal{L}^{2}} = \sqrt{...
+                                                ^^^^^^^^^^^^^^^^                                             
+
+12.) Line 536, column 84, Rule ID: ACCORD_NOMBRE[4]
+Message: « solution » et « éléments » ne semblent pas bien accordés en nombre.
+...ytique donnée plus haut soit comparable à la solution éléments finis. Il faut donc faire une réinterpolatio...
+                                                ^^^^^^^^^^^^^^^^^                                             
+
+13.) Line 560, column 125, Rule ID: CEST_A_DIRE[1]
+Message: « C’est à dire » est une faute de typographie. Employez 'c'est-à-dire'.
+Suggestion: c'est-à-dire
+...ondition au bord $\vec{u} \wedge \vec{n}=0$, c'est à dire imposer un champ normal au bord. Il suffit d...
+                                                ^^^^^^^^^^^^                                             
+
+14.) Line 580, column 14, Rule ID: ACCORD_NOMBRE[5]
+Message: « fonctions » et « test » ne semblent pas bien accordés en nombre.
+...\subsection{Formulation faible} On prend les fonctions test $\vec{q}(x,y,z)$ et $v(x,y,z)$ non identique...
+                                                ^^^^^^^^^^^^^^                                             
+
+15.) Line 623, column 14, Rule ID: ACCORD_NOMBRE[3]
+Message: « 4 » et « champ » ne semblent pas bien accordés en nombre.
+...ous la forme de la combinaison  linéaire des 4 champ vectoriels $\vec{\tau_{1}}(x,y,z)=\vec{\tau_...
+                                                ^^^^^^^                                             
+
+16.) Line 780, column 13, Rule ID: A_A_ACCENT[3]
+Message: Voulez-vous écrire 'à' ?
+Suggestion: À
+...iques de l'utilisation de MEF++} \subsection{A propos de MEF++} Le logiciel MEF++ est dével...
+                                                ^                                             
+
+17.) Line 787, column 44, Rule ID: ACCORD_R_PERS_VERBE[21]
+Message: Vérifiez l’accord entre le pronom « Ils » et le verbe « compte ».
+...e MEF++ est principalement développé en C++. Ils compte à ce jour 1.7 millions de lignes de code \su...
+                                                ^^^^^^^^^^                                             
+
+18.) Line 798, column 104, Rule ID: ETRE_VPPA_OU_ADJ[4]
+Message: Le mot masculin « enregistré » n’est pas accordé en genre avec le mot féminin « géométrie ».
+...ométriques} de notre objet. La géométrie est enregistré dans un fichier \texttt{.geo}  On définit en...
+                                                ^^^^^^^^^^                                             
+
+19.) Line 800, column 61, Rule ID: ACCORD_NOMBRE[5]
+Message: « des » et « regroupement » ne semblent pas bien accordés en nombre.
+...ite les \emph{entités géométriques}. Ce sont des regroupement de \emph{lieux géométriques}.  On définit so...
+                                                ^^^^^^^^^^^^^^^^                                             
+
+20.) Line 903, column 61, Rule ID: ACCORD_NOMBRE[5]
+Message: « fonctions » et « main » ne semblent pas bien accordés en nombre.
+...in/} : contient les exécutables issus de ces fonctions main \item \texttt{lib/} : contient les bibliothè...
+                                                ^^^^^^^^^^^^^^                                             
+
+21.) Line 904, column 120, Rule ID: ACCORD_NOMBRE[5]
+Message: « fonctions » et « main » ne semblent pas bien accordés en nombre.
+...Ce sont ces outils qui sont appelés dans les fonctions main du dossier \texttt{app/} \item \texttt{src/}...
+                                                ^^^^^^^^^^^^^^                                             
+
+22.) Line 923, column 122, Rule ID: DOUBLE_PUNCTUATION
+Message: Deux points consécutifs
+Suggestion: .
+...AreteEn2} et on met le résultat dans \texttt{../div\$i+1/} On crée ensuite, dans chacun des ...
+                                                ^^                                             
+
+23.) Line 934, column 8, Rule ID: DOUBLE_PUNCTUATION
+Message: Deux points consécutifs
+Suggestion: .
+... 4 8 16 32 do mkdir -p div$i cd div$i ln -sf ../cube.{enti,CL,champs} . cd .. done \end{verb...
+                                                ^^                                             
+
+24.) Line 935, column 4, Rule ID: DOUBLE_PUNCTUATION
+Message: Deux points consécutifs
+Suggestion: .
+...d div$i ln -sf ../cube.{enti,CL,champs} . cd .. done \end{verbatim} On peut ainsi lancer le ...
+                                                ^^                                             
+
+25.) Line 944, column 4, Rule ID: DOUBLE_PUNCTUATION
+Message: Deux points consécutifs
+Suggestion: .
+...pp_gmassot/GIREF/bin/probMaxwell.opt cube cd .. done \end{verbatim} On affiche dans chaque d...
+                                                ^^                                             
+
+26.) Line 948, column 7, Rule ID: ACCORD_NOMBRE[4]
+Message: « solution » et « éléments » ne semblent pas bien accordés en nombre.
+...l{L}^{2}$ entre la solution analytique et la solution éléments finis. \begin{verbatim} for i in 2 4 8 16 do...
+                                                ^^^^^^^^^^^^^^^^^                                             
+
+27.) Line 954, column 4, Rule ID: DOUBLE_PUNCTUATION
+Message: Deux points consécutifs
+Suggestion: .
+... 16 do cd div$i cat NormeResiduL2.valeurs cd .. done  \end{verbatim} \subsection{Logiciels a...
+                                                ^^                                             
+
+28.) Line 960, column 84, Rule ID: CEST_A_DIRE[1]
+Message: « C’est à dire » est une faute de typographie. Employez 'c'est-à-dire'.
+Suggestion: c'est-à-dire
+...}, le modifier, puis faire un \emph{commit}, c'est à dire renvoyer les fichiers modifiés sur le serveu...
+                                                ^^^^^^^^^^^^                                             
+
+29.) Line 969, column 107, Rule ID: QUASI_NOM[1]
+Message: Voulez-vous dire 'non-comités' ?
+Suggestion: non-comités
+...s modifiés sur la copie du \emph{dépot} mais non comités. En vert les fichiers qui sont sur la liste ...
+                                                ^^^^^^^^^^^                                             
+
+30.) Line 975, column 15, Rule ID: CHECK_OUT[1]
+Message: « Check out » est un anglicisme. Employez 'régler la note' (hôtel), 'quitter la chambre' (hôtel).
+Suggestion: régler la note; quitter la chambre
+...hain \emph{commit} \\   \hline   \texttt{git checkout (-p) fichier} & Enlève les modifications fai...
+                                                ^^^^^^^^                                             
+
+31.) Line 1032, column 12, Rule ID: ACCORD_NOMBRE[4]
+Message: « un » et « champs » ne semblent pas bien accordés en nombre.
+...ion dans l'espace $\hat{\Omega}$. On cherche un champs $\vec{u^{ref}}$ tel que : \[ \int_{\mathcal{...
+                                                ^^^^^^^^^                                             
+
+32.) Line 1089, column 12, Rule ID: ACCORD_NOMBRE[4]
+Message: « un » et « champs » ne semblent pas bien accordés en nombre.
+...ion dans l'espace $\hat{\Omega}$. On cherche un champs $\vec{u^{ref}}$ tel que : \[ \iint_{\mathcal...
+                                                ^^^^^^^^^                                             
+Time: 4134ms for 222 sentences (53.7 sentences/sec)

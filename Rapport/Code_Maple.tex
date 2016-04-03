@@ -1,0 +1,107 @@
+%% Created by Maple 18.02, Linux
+%% Source Worksheet: Champs_RaviartThomas.mw
+%% Generated: Wed Aug 12 11:45:45 EDT 2015
+\documentclass{article}
+\usepackage{maplestd2e}
+\def\emptyline{\vspace{12pt}}
+\begin{document}
+\pagestyle{empty}
+\DefineParaStyle{Maple Heading 1}
+\DefineParaStyle{Maple Text Output}
+\DefineParaStyle{Maple Dash Item}
+\DefineParaStyle{Maple Bullet Item}
+\DefineParaStyle{Maple Normal}
+\DefineParaStyle{Maple Heading 4}
+\DefineParaStyle{Maple Heading 3}
+\DefineParaStyle{Maple Heading 2}
+\DefineParaStyle{Maple Warning}
+\DefineParaStyle{Maple Title}
+\DefineParaStyle{Maple Error}
+\DefineCharStyle{Maple Hyperlink}
+\DefineCharStyle{Maple 2D Math}
+\DefineCharStyle{Maple Maple Input}
+\DefineCharStyle{Maple 2D Output}
+\DefineCharStyle{Maple 2D Input}
+\mapleinline{inert}{2d}{with(VectorCalculus)}{\[\displaystyle {\it with} \left( {\it VectorCalculus} \right) \]}
+\begin{maplegroup}
+\mapleresult
+\begin{maplelatex}
+\mapleinline{inert}{2d}{[`&x`, `*`, `+`, `-`, `.`, `<,>`, `<|>`, About, AddCoordinates, ArcLength, BasisFormat, Binormal, Compatibility, ConvertVector, CrossProduct, Curl, Curvature, D, Del, DirectionalDiff, Divergence, DotProduct, Flux, GetCoordinateParameters, GetCoordinates, GetNames, GetPVDescription, GetRootPoint, GetSpace, Gradient, Hessian, IsPositionVector, IsRootedVector, IsVectorField, Jacobian, Laplacian, LineInt, MapToBasis, Nabla, Norm, Normalize, PathInt, PlotPositionVector, PlotVector, PositionVector, PrincipalNormal, RadiusOfCurvature, RootedVector, ScalarPotential, SetCoordinateParameters, SetCoordinates, SpaceCurve, SurfaceInt, TNBFrame, Tangent, TangentLine, TangentPlane, TangentVector, Torsion, Vector, VectorField, VectorPotential, VectorSpace, Wronskian, diff, eval, evalVF, int, limit, series]}{\[\displaystyle [\mbox {{\tt `\&x`}},\mbox {{\tt `*`}},\mbox {{\tt `+`}}\\
+\mbox{},\mbox {{\tt `-`}},\mbox {{\tt `.`}},\mbox {{\tt `$<$,$>$`}}\\
+\mbox{},\mbox {{\tt `$<$$|$$>$`}},{\it About},{\it AddCoordinates}\\
+\mbox{},{\it ArcLength},{\it BasisFormat},{\it Binormal}\\
+\mbox{},{\it Compatibility},{\it ConvertVector},{\it CrossProduct}\\
+\mbox{},{\it Curl},{\it Curvature},D,{\it Del},{\it DirectionalDiff}\\
+\mbox{},{\it Divergence},{\it DotProduct},{\it Flux},{\it GetCoordinateParameters}\\
+\mbox{},{\it GetCoordinates},{\it GetNames},{\it GetPVDescription}\\
+\mbox{},{\it GetRootPoint},{\it GetSpace},{\it Gradient}\\
+\mbox{},{\it Hessian},{\it IsPositionVector},{\it IsRootedVector}\\
+\mbox{},{\it IsVectorField},{\it Jacobian},{\it Laplacian}\\
+\mbox{},{\it LineInt},{\it MapToBasis},{\it Nabla},{\it Norm}\\
+\mbox{},{\it Normalize},{\it PathInt},{\it PlotPositionVector}\\
+\mbox{},{\it PlotVector},{\it PositionVector},{\it PrincipalNormal}\\
+\mbox{},{\it RadiusOfCurvature},{\it RootedVector},{\it ScalarPotential}\\
+\mbox{},{\it SetCoordinateParameters},{\it SetCoordinates}\\
+\mbox{},{\it SpaceCurve},{\it SurfaceInt},{\it TNBFrame}\\
+\mbox{},{\it Tangent},{\it TangentLine},{\it TangentPlane}\\
+\mbox{},{\it TangentVector},{\it Torsion},{\it Vector},{\it VectorField}\\
+\mbox{},{\it VectorPotential},{\it VectorSpace},{\it Wronskian}\\
+\mbox{},{\it diff},{\it eval},{\it evalVF},{\it int},{\it limit}\\
+\mbox{},{\it series}]\]}
+\end{maplelatex}
+\end{maplegroup}
+\mapleinline{inert}{2d}{Vx := 3*cos(Pi*x)*sin(Pi*y)*sin(Pi*z)}{\[\displaystyle {\it Vx}\, := \,3\,\cos \left( \pi \,x \right) \sin \left( \pi \,y \right) \sin \left( \pi \,z \right) \]}
+\begin{maplegroup}
+\mapleresult
+\begin{maplelatex}
+\mapleinline{inert}{2d}{3*cos(Pi*x)*sin(Pi*y)*sin(Pi*z)}{\[\displaystyle 3\,\cos \left( \pi \,x \right) \sin \left( \pi \,y \right) \sin \left( \pi \,z \right) \]}
+\end{maplelatex}
+\end{maplegroup}
+\mapleinline{inert}{2d}{Vy := 2*sin(Pi*x)*cos(Pi*y)*sin(Pi*z)}{\[\displaystyle {\it Vy}\, := \,2\,\sin \left( \pi \,x \right) \cos \left( \pi \,y \right) \sin \left( \pi \,z \right) \]}
+\begin{maplegroup}
+\mapleresult
+\begin{maplelatex}
+\mapleinline{inert}{2d}{2*sin(Pi*x)*cos(Pi*y)*sin(Pi*z)}{\[\displaystyle 2\,\sin \left( \pi \,x \right) \cos \left( \pi \,y \right) \sin \left( \pi \,z \right) \]}
+\end{maplelatex}
+\end{maplegroup}
+\mapleinline{inert}{2d}{Vz := sin(Pi*x)*sin(Pi*y)*cos(Pi*z)}{\[\displaystyle {\it Vz}\, := \,\sin \left( \pi \,x \right) \sin \left( \pi \,y \right) \cos \left( \pi \,z \right) \]}
+\begin{maplegroup}
+\mapleresult
+\begin{maplelatex}
+\mapleinline{inert}{2d}{sin(Pi*x)*sin(Pi*y)*cos(Pi*z)}{\[\displaystyle \sin \left( \pi \,x \right) \sin \left( \pi \,y \right) \cos \left( \pi \,z \right) \]}
+\end{maplelatex}
+\end{maplegroup}
+\mapleinline{inert}{2d}{v := VectorField(`<,>`(Vx, Vy, Vz), 'cartesian'[x, y, z])}{\[\displaystyle v\, := \,{\it VectorField} \left( \mbox {{\tt `$<$,$>$`}} \left( {\it Vx}\\
+\mbox{},{\it Vy},{\it Vz} \right) ,'cartesian'_{{x,y,z}} \right) \]}
+\begin{maplegroup}
+\mapleresult
+\begin{maplelatex}
+\mapleinline{inert}{2d}{3*cos(Pi*x)*sin(Pi*y)*sin(Pi*z)*`#mover(mi("e"),mo("&lowbar;"))`[x]+2*sin(Pi*x)*cos(Pi*y)*sin(Pi*z)*`#mover(mi("e"),mo("&lowbar;"))`[y]+sin(Pi*x)*sin(Pi*y)*cos(Pi*z)*`#mover(mi("e"),mo("&lowbar;"))`[z]}{\[\displaystyle 3\,\cos \left( \pi \,x \right) \sin \left( \pi \,y \right) \sin \left( \pi \,z \right) \mbox {{\tt `\#mover(mi("e"),mo("`}}{\it \_}\mbox {{\tt `"))`}}\\
+\mbox{}\\
+\mbox{}_{{x}}+2\,\sin \left( \pi \,x \right) \cos \left( \pi \,y \right) \sin \left( \pi \,z \right) \mbox {{\tt `\#mover(mi("e"),mo("`}}{\it \_}\mbox {{\tt `"))`}}\\
+\mbox{}\\
+\mbox{}_{{y}}+\sin \left( \pi \,x \right) \sin \left( \pi \,y \right) \cos \left( \pi \,z \right) \mbox {{\tt `\#mover(mi("e"),mo("`}}{\it \_}\mbox {{\tt `"))`}}\\
+\mbox{}\\
+\mbox{}_{{z}}\]}
+\end{maplelatex}
+\end{maplegroup}
+\mapleinline{inert}{2d}{champs := simplify(-Laplacian(v)+v)}{\[\displaystyle {\it champs}\, := \,{\it simplify} \left( -{\it Laplacian} \left( v \right) +v \right) \]}
+\begin{maplegroup}
+\mapleresult
+\begin{maplelatex}
+\mapleinline{inert}{2d}{3*cos(Pi*x)*sin(Pi*y)*sin(Pi*z)*(3*Pi^2+1)*`#mover(mi("e"),mo("&lowbar;"))`[x]+2*sin(Pi*x)*cos(Pi*y)*sin(Pi*z)*(3*Pi^2+1)*`#mover(mi("e"),mo("&lowbar;"))`[y]+sin(Pi*x)*sin(Pi*y)*cos(Pi*z)*(3*Pi^2+1)*`#mover(mi("e"),mo("&lowbar;"))`[z]}{\[\displaystyle 3\,\cos \left( \pi \,x \right) \sin \left( \pi \,y \right) \sin \left( \pi \,z \right)  \left( 3\,{\pi }^{2}+1 \right) \mbox {{\tt `\#mover(mi("e"),mo("`}}{\it \_}\mbox {{\tt `"))`}}\\
+\mbox{}\\
+\mbox{}_{{x}}+2\,\sin \left( \pi \,x \right) \cos \left( \pi \,y \right) \sin \left( \pi \,z \right)  \left( 3\,{\pi }^{2}+1 \right) \mbox {{\tt `\#mover(mi("e"),mo("`}}{\it \_}\mbox {{\tt `"))`}}\\
+\mbox{}\\
+\mbox{}_{{y}}\\
+\mbox{}+\sin \left( \pi \,x \right) \sin \left( \pi \,y \right) \cos \left( \pi \,z \right)  \left( 3\,{\pi }^{2}+1 \right) \mbox {{\tt `\#mover(mi("e"),mo("`}}{\it \_}\mbox {{\tt `"))`}}\\
+\mbox{}\\
+\mbox{}_{{z}}\]}
+\end{maplelatex}
+\end{maplegroup}
+\begin{Maple Normal}{
+\begin{Maple Normal}{
+\mapleinline{inert}{2d}{}{\[\displaystyle \]}
+}\end{Maple Normal}
+}\end{Maple Normal}
+\end{document}
